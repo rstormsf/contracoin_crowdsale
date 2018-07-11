@@ -6,7 +6,7 @@ require('chai')
 
 const ContraCoin = artifacts.require('ContraCoin');
 
-contract('ContraCoin', function ([owner, anotherAccount]) {
+contract('ContraCoin', accounts => {
   const _name = "ContraCoin";
   const _symbol = "CTC";
   const _decimals = 18;
