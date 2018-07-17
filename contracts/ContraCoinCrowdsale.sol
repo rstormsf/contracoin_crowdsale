@@ -9,9 +9,9 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol
 contract ContraCoinCrowdsale is Crowdsale, CappedCrowdsale {
 
     constructor(
-        uint _rate,
+        uint    _rate,
         address _wallet,
-        ERC20 _token,
+        ERC20   _token,
         uint256 _cap
     )
         Crowdsale(_rate, _wallet, _token)
