@@ -13,7 +13,7 @@ require('chai')
 const ContraCoin = artifacts.require('./ContraCoin');
 const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 
-contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) => {
+contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser, notWhitelisted]) => {
 
   beforeEach(async function () {
     // Deploy Token
@@ -54,7 +54,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
     await this.token.transferOwnership(this.crowdsale.address);
 
     // Whitelist Investors
-    await this.crowdsale.addManyToWhitelist([investor1, investor2]);
+    await this.crowdsale.addManyToWhitelist([_, investor1, investor2, purchaser]);
 
     // Advance time to crowdsale start
     await increaseTimeTo(this.openingTime + 1);
@@ -88,6 +88,18 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
     it('has the correct hard cap value', async function () {
       const cap = await this.crowdsale.cap();
       cap.should.be.bignumber.equal(this.hardCap);
+    });
+  });
+
+  // describe('minted crowdsale', function () {
+  //   it('mints tokens after purchase', async function () {
+
+  //   });
+  // });
+
+  describe('whitelisted crowdsale', function () {
+    it('rejects contributions from non-whitelisted accounts', async function () {
+      await this.crowdsale.buyTokens(notWhitelisted, { value: ether(1), from: notWhitelisted }).should.be.rejectedWith(EVMRevert);
     });
   });
 

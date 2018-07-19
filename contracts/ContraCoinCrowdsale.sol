@@ -7,9 +7,8 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol"
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract ContraCoinCrowdsale is Ownable, Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, WhitelistedCrowdsale {
+contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, WhitelistedCrowdsale {
 
   // Track investor contributions
   uint256 public investorMinCap;
