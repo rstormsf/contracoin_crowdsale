@@ -180,7 +180,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
       await this.crowdsale.buyTokens(investor1, { value: ether(1), from: investor1 });
       // Attempt to transfer tokens during crowdsale
       await this.token.transfer(investor2, 1, { from: investor1 }).should.be.rejectedWith(EVMRevert);
-      // ;
     });
 
     // It enables token transfers after sale is over
