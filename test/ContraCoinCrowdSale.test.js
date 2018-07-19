@@ -95,8 +95,8 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser, no
     it('mints tokens after purchase', async function () {
       const originalTotalSupply = await this.token.totalSupply();
       await this.crowdsale.send(ether(1));
-      const newTotalSupply = await.this.token.totalSupply();
-      assert(newTotalSupply > originalTotalSupply).equal(true)
+      const newTotalSupply = await this.token.totalSupply();
+      assert.isTrue(newTotalSupply > originalTotalSupply);
     });
   });
 
