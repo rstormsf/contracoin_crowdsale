@@ -1,5 +1,8 @@
 import ether from './helpers/ether';
 import EVMRevert from './helpers/EVMRevert';
+import { increaseTimeTo, duration } from './helpers/increaseTime';
+import { advanceBlock } from './helpers/advanceToBlock';
+import latestTime from './helpers/latestTime';
 
 const BigNumber = web3.BigNumber;
 
@@ -14,9 +17,16 @@ const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) => {
   const _rate = 500;
   const _wallet = wallet;
+  // const _openingTime = latestTime() + duration.weeks(1);
+  // const _closingTime = _openingTime + duration.weeks(1);
   const _hardCap = ether(100);
   const _investorMinCap = ether(0.002);
   const _investorHardCap = ether(50);
+
+  before(async function () {
+    // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
+    await advanceBlock();
+  });
 
   beforeEach(async function () {
     // Deploy Token
@@ -27,10 +37,15 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
 
     // Deploy Crowdsale
     const _token = this.token.address;
+    this.openingTime = latestTime() + duration.weeks(1);
+    this.closingTime = this.openingTime + duration.weeks(1);
+
     this.crowdsale = await ContraCoinCrowdsale.new(
       _rate,
       _wallet,
       _token,
+      this.openingTime,
+      this.closingTime,
       _hardCap,
       _investorMinCap,
       _investorHardCap
@@ -38,7 +53,14 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
 
     // Transfer token ownership to crowdsale
     await this.token.transferOwnership(this.crowdsale.address);
+
+    // Advance time to crowdsale start
+    await increaseTimeTo(this.openingTime + 1);
   });
+
+  // afterEach(async function() {
+  //   await increaseTimeTo(latestTime());
+  // });
 
   describe('crowdsale', function() {
     it('tracks the token', async function () {
@@ -54,6 +76,12 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
     it('tracks the wallet', async function () {
       const wallet = await this.crowdsale.wallet();
       wallet.should.equal(_wallet);
+    });
+  });
+
+  describe('timed crowdsale', function () {
+    it('is open', async function () {
+      // await this.crowdsale.hasClosed(icoStage, { from: investor1 }).should.be.false;
     });
   });
 
