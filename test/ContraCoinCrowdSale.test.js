@@ -77,7 +77,8 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
 
   describe('timed crowdsale', function () {
     it('is open', async function () {
-      await this.crowdsale.hasClosed(icoStage, { from: investor1 }).should.be.false;
+      const isClosed = await this.crowdsale.hasClosed();
+      isClosed.should.be.false;
     });
   });
 
