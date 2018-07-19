@@ -75,7 +75,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
   describe('buyTokens()', function () {
     describe('when the contribution is less than the minimum cap', function () {
       it('rejects the transaction', async function () {
-        // Value less than min investor cap;
+        // Value less than min investor cap
         // Investor 2 hasn't contributed yet
         const value = _investorMinCap - 1;
         await this.crowdsale.buyTokens(investor2, { value: value, from: investor2 }).should.be.rejectedWith(EVMRevert);
