@@ -16,10 +16,10 @@ const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 
 contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) => {
 
-  before(async function () {
-    // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
-    await advanceBlock();
-  });
+  // before(async function () {
+  //   // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
+  //   await advanceBlock();
+  // });
 
   beforeEach(async function () {
     // Deploy Token

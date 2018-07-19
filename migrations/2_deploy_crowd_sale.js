@@ -28,6 +28,8 @@ module.exports = async function(deployer, network, accounts) {
 
   const deployedCrowdsale = await crowdsaleContract.deployed();
 
+  // pause token
+
   await deployedToken.transferOwnership(deployedCrowdsale.address);
 
   return true;
