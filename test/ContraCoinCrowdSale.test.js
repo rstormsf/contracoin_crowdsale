@@ -12,7 +12,7 @@ const ContraCoin = artifacts.require('./ContraCoin');
 const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 
 contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) => {
-  const _rate = 1;
+  const _rate = 500;
   const _wallet = wallet;
   const _hardCap = ether(100);
   const _investorMinCap = ether(0.002);
@@ -119,6 +119,34 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
         const contribution = await this.crowdsale.getUserContribution(investor2);
         contribution.should.be.bignumber.equal(value);
       });
+    });
+  });
+
+  describe('crowd sale stages', function () {
+    const preIcoStage = 0;
+    const icoStage = 1;
+    const icoRate = 250;
+
+    it('it starts in PreICO', async function () {
+      const stage = await this.crowdsale.stage();
+      stage.should.be.bignumber.equal(preIcoStage);
+    });
+
+    it('starts at the opening (deployed) rate', async function () {
+      const rate = await this.crowdsale.rate();
+      rate.should.be.bignumber.equal(_rate);
+    });
+
+    it('allows admin to update the stage & rate', async function () {
+      await this.crowdsale.setCrowdsaleStage(icoStage, { from: _ });
+      const stage = await this.crowdsale.stage();
+      stage.should.be.bignumber.equal(icoStage);
+      const rate = await this.crowdsale.rate();
+      rate.should.be.bignumber.equal(icoRate);
+    });
+
+    it('prevents non-admin from updating the stage', async function () {
+      await this.crowdsale.setCrowdsaleStage(icoStage, { from: investor1 }).should.be.rejectedWith(EVMRevert);
     });
   });
 });
