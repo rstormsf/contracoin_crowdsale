@@ -45,9 +45,7 @@ contract ContraCoinCrowdsale is Crowdsale, CappedCrowdsale, MintedCrowdsale {
         uint256 _existingContribution = contributions[_beneficiary];
         uint256 _newContribution = _existingContribution.add(_weiAmount);
         require(_newContribution >= investorMinCap && _newContribution <= investorHardCap);
-        contributions[_beneficiary] = _existingContribution.add(_weiAmount);
-
-        // require(investorMinCap <= contributions[_beneficiary].add(_weiAmount) <= investorHardCap);
+        contributions[_beneficiary] = _newContribution;
     }
 
     /**
