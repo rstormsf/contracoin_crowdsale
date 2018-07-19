@@ -15,13 +15,6 @@ const ContraCoin = artifacts.require('./ContraCoin');
 const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 
 contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) => {
-  const _rate = 500;
-  const _wallet = wallet;
-  const _openingTime = this.openingTime;
-  const _closingTime = this.closingTime;
-  const _hardCap = ether(100);
-  const _investorMinCap = ether(0.002);
-  const _investorHardCap = ether(50);
 
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
@@ -30,25 +23,34 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
 
   beforeEach(async function () {
     // Deploy Token
-    const _name = "ContraCoin";
-    const _symbol = "CTC";
-    const _decimals = 18;
-    this.token = await ContraCoin.new(_name, _symbol, _decimals);
+    this.name = "ContraCoin";
+    this.symbol = "CTC";
+    this.decimals = 18;
+
+    this.token = await ContraCoin.new(
+      this.name,
+      this.symbol,
+      this.decimals
+    );
 
     // Deploy Crowdsale
-    const _token = this.token.address;
+    this.rate = 500;
+    this.wallet = wallet;
     this.openingTime = latestTime() + duration.weeks(1);
     this.closingTime = this.openingTime + duration.weeks(1);
+    this.hardCap = ether(100);
+    this.investorMinCap = ether(0.002);
+    this.investorHardCap = ether(50);
 
     this.crowdsale = await ContraCoinCrowdsale.new(
-      _rate,
-      _wallet,
-      _token,
-      _openingTime,
-      _closingTime,
-      _hardCap,
-      _investorMinCap,
-      _investorHardCap
+      this.rate,
+      this.wallet,
+      this.token.address,
+      this.openingTime,
+      this.closingTime,
+      this.hardCap,
+      this.investorMinCap,
+      this.investorHardCap
     );
 
     // Transfer token ownership to crowdsale
@@ -66,12 +68,12 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
 
     it('tracks the rate', async function () {
       const rate = await this.crowdsale.rate();
-      rate.should.be.bignumber.equal(_rate);
+      rate.should.be.bignumber.equal(this.rate);
     });
 
     it('tracks the wallet', async function () {
       const wallet = await this.crowdsale.wallet();
-      wallet.should.equal(_wallet);
+      wallet.should.equal(this.wallet);
     });
   });
 
@@ -85,7 +87,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
   describe('capped crowdsale', function () {
     it('has the correct hard cap value', async function () {
       const cap = await this.crowdsale.cap();
-      cap.should.be.bignumber.equal(_hardCap);
+      cap.should.be.bignumber.equal(this.hardCap);
     });
   });
 
@@ -102,7 +104,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
       it('rejects the transaction', async function () {
         // Value less than min investor cap
         // Investor 2 hasn't contributed yet
-        const value = _investorMinCap - 1;
+        const value = this.investorMinCap - 1;
         await this.crowdsale.buyTokens(investor2, { value: value, from: investor2 }).should.be.rejectedWith(EVMRevert);
       });
 
@@ -159,7 +161,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
 
     it('starts at the opening (deployed) rate', async function () {
       const rate = await this.crowdsale.rate();
-      rate.should.be.bignumber.equal(_rate);
+      rate.should.be.bignumber.equal(this.rate);
     });
 
     it('allows admin to update the stage & rate', async function () {
