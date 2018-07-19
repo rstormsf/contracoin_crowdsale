@@ -58,10 +58,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
     await increaseTimeTo(this.openingTime + 1);
   });
 
-  // afterEach(async function() {
-  //   await increaseTimeTo(latestTime());
-  // });
-
   describe('crowdsale', function() {
     it('tracks the token', async function () {
       const token = await this.crowdsale.token();
@@ -81,7 +77,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
 
   describe('timed crowdsale', function () {
     it('is open', async function () {
-      // await this.crowdsale.hasClosed(icoStage, { from: investor1 }).should.be.false;
+      await this.crowdsale.hasClosed(icoStage, { from: investor1 }).should.be.false;
     });
   });
 
