@@ -1,7 +1,6 @@
 import ether from './helpers/ether';
 import EVMRevert from './helpers/EVMRevert';
 import { increaseTimeTo, duration } from './helpers/increaseTime';
-import { advanceBlock } from './helpers/advanceToBlock';
 import latestTime from './helpers/latestTime';
 
 const BigNumber = web3.BigNumber;
@@ -15,11 +14,6 @@ const ContraCoin = artifacts.require('./ContraCoin');
 const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 
 contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) => {
-
-  // before(async function () {
-  //   // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
-  //   await advanceBlock();
-  // });
 
   beforeEach(async function () {
     // Deploy Token
@@ -52,6 +46,9 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
       this.investorMinCap,
       this.investorHardCap
     );
+
+    // Pause Token
+    await this.token.pause();
 
     // Transfer token ownership to crowdsale
     await this.token.transferOwnership(this.crowdsale.address);
@@ -176,4 +173,20 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
       await this.crowdsale.setCrowdsaleStage(icoStage, { from: investor1 }).should.be.rejectedWith(EVMRevert);
     });
   });
+
+  describe('token transfers', function () {
+    it('reverts when trying to transfer from when paused', async function () {
+      // Buy some tokens first
+      await this.crowdsale.buyTokens(investor1, { value: ether(1), from: investor1 });
+      // Attempt to transfer tokens during crowdsale
+      await this.token.transfer(investor2, 1, { from: investor1 }).should.be.rejectedWith(EVMRevert);
+      // ;
+    });
+
+    // It enables token transfers after sale is over
+  });
+
+  // End Sale
+  // Can Transfer Tokens
+  // Can Claim Refunds
 });
