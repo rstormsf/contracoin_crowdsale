@@ -2,13 +2,14 @@ pragma solidity 0.4.24;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/crowdsale/Crowdsale.sol";
+// import "openzeppelin-solidity/contracts/crowdsale/RefundableCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
+import "openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-// import "openzeppelin-solidity/contracts/crowdsale/RefundableCrowdsale.sol";
 
-contract ContraCoinCrowdsale is Ownable, Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale {
+contract ContraCoinCrowdsale is Ownable, Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, WhitelistedCrowdsale {
 
   // Track investor contributions
   uint256 public investorMinCap;

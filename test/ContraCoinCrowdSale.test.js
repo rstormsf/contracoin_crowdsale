@@ -53,6 +53,9 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
     // Transfer token ownership to crowdsale
     await this.token.transferOwnership(this.crowdsale.address);
 
+    // Whitelist Investors
+    await this.crowdsale.addManyToWhitelist([investor1, investor2]);
+
     // Advance time to crowdsale start
     await increaseTimeTo(this.openingTime + 1);
   });
@@ -181,7 +184,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
       // Attempt to transfer tokens during crowdsale
       await this.token.transfer(investor2, 1, { from: investor1 }).should.be.rejectedWith(EVMRevert);
     });
-
     // It enables token transfers after sale is over
   });
 
