@@ -13,9 +13,19 @@ module.exports = async function(deployer, network, accounts) {
   const _wallet = accounts[0];
   const _token  = deployedToken.address;
   const _cap    = web3.toWei(100, 'ether');
-  const _minCap = web3.toWei(0.002, 'ether');
+  const _investorMinCap  = web3.toWei(0.002, 'ether');
+  const _investorHardCap = web3.toWei(50, 'ether');
 
-  await deployer.deploy(crowdsaleContract, _rate, _wallet, _token, _cap, _minCap);
+  await deployer.deploy(
+    crowdsaleContract,
+    _rate,
+    _wallet,
+    _token,
+    _cap,
+    _investorMinCap,
+    _investorHardCap
+  );
+
   const deployedCrowdsale = await crowdsaleContract.deployed();
 
   await deployedToken.transferOwnership(deployedCrowdsale.address);
