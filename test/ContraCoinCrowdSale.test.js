@@ -91,11 +91,14 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser, no
     });
   });
 
-  // describe('minted crowdsale', function () {
-  //   it('mints tokens after purchase', async function () {
-
-  //   });
-  // });
+  describe('minted crowdsale', function () {
+    it('mints tokens after purchase', async function () {
+      const originalTotalSupply = await this.token.totalSupply();
+      await this.crowdsale.send(ether(1));
+      const newTotalSupply = await.this.token.totalSupply();
+      assert(newTotalSupply > originalTotalSupply).equal(true)
+    });
+  });
 
   describe('whitelisted crowdsale', function () {
     it('rejects contributions from non-whitelisted accounts', async function () {
