@@ -17,8 +17,8 @@ const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) => {
   const _rate = 500;
   const _wallet = wallet;
-  // const _openingTime = latestTime() + duration.weeks(1);
-  // const _closingTime = _openingTime + duration.weeks(1);
+  const _openingTime = this.openingTime;
+  const _closingTime = this.closingTime;
   const _hardCap = ether(100);
   const _investorMinCap = ether(0.002);
   const _investorHardCap = ether(50);
@@ -44,8 +44,8 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
       _rate,
       _wallet,
       _token,
-      this.openingTime,
-      this.closingTime,
+      _openingTime,
+      _closingTime,
       _hardCap,
       _investorMinCap,
       _investorHardCap
