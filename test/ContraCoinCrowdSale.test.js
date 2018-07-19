@@ -104,11 +104,20 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, purchaser]) =
     describe('when the total contributions exceed the investor hard cap', function () {
       it('rejects the transaction', async function () {
         // First contribution is in valid range
-        const value1 = ether(1);
+        const value1 = ether(2);
         await this.crowdsale.buyTokens(investor1, { value: value1, from: investor1 });
         // Second contribution sends total contributions over investor hard cap
-        const value2 = ether(50);
+        const value2 = ether(49);
         await this.crowdsale.buyTokens(investor1, { value: value2, from: investor1 }).should.be.rejectedWith(EVMRevert);
+      });
+    });
+
+    describe('when the contribution is within the valid range', function () {
+      const value = ether(2);
+      it('succeeds & updates the contribution amount', async function () {
+        await this.crowdsale.buyTokens(investor2, { value: value, from: investor2 }).should.be.fulfilled;
+        const contribution = await this.crowdsale.getUserContribution(investor2);
+        contribution.should.be.bignumber.equal(value);
       });
     });
   });

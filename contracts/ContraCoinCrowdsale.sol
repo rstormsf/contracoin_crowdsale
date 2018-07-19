@@ -9,9 +9,9 @@ import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 contract ContraCoinCrowdsale is Crowdsale, CappedCrowdsale, MintedCrowdsale {
 
     // Track investor contributions
-    uint256 public investorMinCap;
-    uint256 public investorHardCap;
-    mapping(address => uint256) public contributions;
+    uint256 investorMinCap;
+    uint256 investorHardCap;
+    mapping(address => uint256) contributions;
 
     constructor(
         uint    _rate,
@@ -45,8 +45,19 @@ contract ContraCoinCrowdsale is Crowdsale, CappedCrowdsale, MintedCrowdsale {
         uint256 _existingContribution = contributions[_beneficiary];
         uint256 _newContribution = _existingContribution.add(_weiAmount);
         require(_newContribution >= investorMinCap && _newContribution <= investorHardCap);
-        contributions[_beneficiary] = _newContribution;
+        contributions[_beneficiary] = _existingContribution.add(_weiAmount);
 
         // require(investorMinCap <= contributions[_beneficiary].add(_weiAmount) <= investorHardCap);
+    }
+
+    /**
+    * @dev Returns the amount contributed so far by a sepecific user.
+    * @param _beneficiary Address of contributor
+    * @return User contribution so far
+    */
+    function getUserContribution(address _beneficiary)
+        public view returns (uint256)
+    {
+        return contributions[_beneficiary];
     }
 }
