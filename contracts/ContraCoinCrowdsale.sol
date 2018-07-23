@@ -1,14 +1,15 @@
 pragma solidity 0.4.24;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/PausableToken.sol";
 import "openzeppelin-solidity/contracts/crowdsale/Crowdsale.sol";
-// import "openzeppelin-solidity/contracts/crowdsale/RefundableCrowdsale.sol";
+import "openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
+import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol";
-import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 
-contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, WhitelistedCrowdsale {
+contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, WhitelistedCrowdsale, RefundableCrowdsale {
 
   // Track investor contributions
   uint256 public investorMinCap;
@@ -28,11 +29,13 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     uint256 _closingTime,
     uint256 _hardCap,
     uint256 _investorMinCap,
-    uint256 _investorHardCap
+    uint256 _investorHardCap,
+    uint256 _goal
   )
     Crowdsale(_rate, _wallet, _token)
     TimedCrowdsale(_openingTime, _closingTime)
     CappedCrowdsale(_hardCap)
+    RefundableCrowdsale(_goal)
     public
   {
     investorMinCap  = _investorMinCap;
@@ -85,5 +88,27 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     } else if (stage == CrowdsaleStage.ICO) {
       rate = 250;
     }
+  }
+
+  /**
+   * @dev forwards funds to the wallet during the PreICO stage, then the refund vault during ICO stage
+   */
+  function _forwardFunds() internal {
+    if (stage == CrowdsaleStage.PreICO) {
+      wallet.transfer(msg.value);
+    } else if (stage == CrowdsaleStage.ICO) {
+      super._forwardFunds();
+    }
+  }
+
+  /**
+   * @dev enables token transfers, called when owner calls finalize()
+   */
+  function finalization() internal {
+    if (goalReached()) {
+      PausableToken(token).unpause();
+    }
+
+    super.finalization();
   }
 }
