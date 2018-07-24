@@ -293,7 +293,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, in
         // Prevents investor from claiming refund
         await this.vault.refund(investor3, { from: investor3 }).should.be.rejectedWith(EVMRevert);
         // Enables token transfers
-        await this.token.transfer(investor4, 1, { from: investor3 }).should.be.fulfilled;
+        await this.token.transfer(investor4, 1, { from: investor4 }).should.be.fulfilled;
       });
 
       // Funds get forwarded to the admin
