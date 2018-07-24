@@ -51,6 +51,7 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     RefundableCrowdsale(_goal)
     public
   {
+    // require(_goal <= _hardCap);
     investorMinCap  = _investorMinCap;
     investorHardCap = _investorHardCap;
     foundersFund = _foundersFund;
@@ -122,20 +123,20 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
    */
   function finalization() internal {
     if (goalReached()) {
-      // // Track amount of tokens minted in the crowdsale
-      // MintableToken _mintableToken = MintableToken(token);
-      // uint256 _alreadyMinted = _mintableToken.totalSupply();
+      // Track amount of tokens minted in the crowdsale
+      MintableToken _mintableToken = MintableToken(token);
+      uint256 _alreadyMinted = _mintableToken.totalSupply();
 
-      // // Calculate the final total supply from the amount of tokens minted in the crowdsale
-      // // Use the public sale percentage to evaluate this figure
-      // uint256 _finalTotalSupply = _alreadyMinted.div(tokenSalePercentage).mul(100);
+      // Calculate the final total supply from the amount of tokens minted in the crowdsale
+      // Use the public sale percentage to evaluate this figure
+      uint256 _finalTotalSupply = _alreadyMinted.div(tokenSalePercentage).mul(100);
 
-      // // Mint tokens for funds
-      // _mintableToken.mint(foundersFund,   _finalTotalSupply.div(foundersPercentage));
-      // _mintableToken.mint(foundationFund, _finalTotalSupply.div(foundationPercentage));
-      // _mintableToken.mint(partnersFund,   _finalTotalSupply.div(partnersPercentage));
+      // Mint tokens for funds
+      _mintableToken.mint(foundersFund,   _finalTotalSupply.div(foundersPercentage));
+      _mintableToken.mint(foundationFund, _finalTotalSupply.div(foundationPercentage));
+      _mintableToken.mint(partnersFund,   _finalTotalSupply.div(partnersPercentage));
 
-      // _mintableToken.finishMinting();
+      _mintableToken.finishMinting();
       PausableToken(token).unpause();
     }
 
