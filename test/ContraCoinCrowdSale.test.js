@@ -14,7 +14,7 @@ const ContraCoin = artifacts.require('./ContraCoin');
 const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 const RefundVault = artifacts.require('./RefundVault');
 
-contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, purchaser, notWhitelisted]) => {
+contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, notWhitelisted]) => {
 
   beforeEach(async function () {
     // Deploy Token
@@ -62,7 +62,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, pu
     await this.token.transferOwnership(this.crowdsale.address);
 
     // Whitelist Investors
-    await this.crowdsale.addManyToWhitelist([_, investor1, investor2, investor3, purchaser]);
+    await this.crowdsale.addManyToWhitelist([_, investor1, investor2, investor3]);
 
     // Track refund vault
     this.vaultAddress = await this.crowdsale.vault();
@@ -121,6 +121,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, pu
   describe('accepting payments', function () {
     it('should accept payments', async function () {
       const value = ether(10);
+      const purchaser = investor2;
       await this.crowdsale.send(value).should.be.fulfilled;
       await this.crowdsale.buyTokens(investor1, { value: value, from: purchaser }).should.be.fulfilled;
     });
