@@ -16,6 +16,11 @@ const RefundVault = artifacts.require('./RefundVault');
 
 contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, notWhitelisted]) => {
 
+  before(async function() {
+    // Transfer extra ether to investor1's account for testing
+    await web3.eth.sendTransaction({ from: _, to: investor1, value: ether(50) })
+  });
+
   beforeEach(async function () {
     // Deploy Token
     this.name = "ContraCoin";
@@ -120,7 +125,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, no
 
   describe('accepting payments', function () {
     it('should accept payments', async function () {
-      const value = ether(10);
+      const value = ether(1);
       const purchaser = investor2;
       await this.crowdsale.send(value).should.be.fulfilled;
       await this.crowdsale.buyTokens(investor1, { value: value, from: purchaser }).should.be.fulfilled;
