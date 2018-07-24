@@ -2,6 +2,7 @@ pragma solidity 0.4.24;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/PausableToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 import "openzeppelin-solidity/contracts/crowdsale/Crowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
@@ -21,6 +22,15 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
   // Default to presale stage
   CrowdsaleStage public stage = CrowdsaleStage.PreICO;
 
+  // Token Distribution
+  address public foundersFund;
+  address public foundationFund;
+  address public partnersFund;
+  uint256 public tokenSalePercentage  = 70;
+  uint256 public foundersPercentage   = 10;
+  uint256 public foundationPercentage = 10;
+  uint256 public partnersPercentage   = 10;
+
   constructor(
     uint    _rate,
     address _wallet,
@@ -30,7 +40,10 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     uint256 _hardCap,
     uint256 _investorMinCap,
     uint256 _investorHardCap,
-    uint256 _goal
+    uint256 _goal,
+    address _foundersFund,
+    address _foundationFund,
+    address _partnersFund
   )
     Crowdsale(_rate, _wallet, _token)
     TimedCrowdsale(_openingTime, _closingTime)
@@ -40,6 +53,9 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
   {
     investorMinCap  = _investorMinCap;
     investorHardCap = _investorHardCap;
+    foundersFund = _foundersFund;
+    foundationFund = _foundationFund;
+    partnersFund = _partnersFund;
   }
 
   /**
@@ -106,6 +122,20 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
    */
   function finalization() internal {
     if (goalReached()) {
+      // // Track amount of tokens minted in the crowdsale
+      // MintableToken _mintableToken = MintableToken(token);
+      // uint256 _alreadyMinted = _mintableToken.totalSupply();
+
+      // // Calculate the final total supply from the amount of tokens minted in the crowdsale
+      // // Use the public sale percentage to evaluate this figure
+      // uint256 _finalTotalSupply = _alreadyMinted.div(tokenSalePercentage).mul(100);
+
+      // // Mint tokens for funds
+      // _mintableToken.mint(foundersFund,   _finalTotalSupply.div(foundersPercentage));
+      // _mintableToken.mint(foundationFund, _finalTotalSupply.div(foundationPercentage));
+      // _mintableToken.mint(partnersFund,   _finalTotalSupply.div(partnersPercentage));
+
+      // _mintableToken.finishMinting();
       PausableToken(token).unpause();
     }
 

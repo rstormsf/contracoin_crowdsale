@@ -14,7 +14,7 @@ const ContraCoin = artifacts.require('./ContraCoin');
 const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 const RefundVault = artifacts.require('./RefundVault');
 
-contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2]) => {
+contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund, foundationFund, partnersFund]) => {
 
   before(async function() {
     // Transfer extra ether to investor1's account for testing
@@ -22,18 +22,19 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2]) => {
   });
 
   beforeEach(async function () {
-    // Deploy Token
+    // Token configuration
     this.name = "ContraCoin";
     this.symbol = "CTC";
     this.decimals = 18;
 
+    // Deploy Token
     this.token = await ContraCoin.new(
       this.name,
       this.symbol,
       this.decimals
     );
 
-    // Deploy Crowdsale
+    // Crowdsale configuration
     this.rate = 500;
     this.wallet = wallet;
     this.openingTime = latestTime() + duration.weeks(1);
@@ -42,12 +43,22 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2]) => {
     this.investorMinCap = ether(0.002);
     this.investorHardCap = ether(50);
     this.goal = ether(50);
+    this.foundersFund = foundersFund;
+    this.foundationFund = foundationFund;
+    this.partnersFund = partnersFund;
 
     // ICO Stages
     this.preIcoStage = 0;
     this.icoStage = 1;
     this.icoRate = 250;
 
+    // Token Distribution
+    this.tokenSalePercentage  = 70;
+    this.foundersPercentage   = 10;
+    this.foundationPercentage = 10;
+    this.partnersPercentage   = 10;
+
+    // Deploy Crowdsale
     this.crowdsale = await ContraCoinCrowdsale.new(
       this.rate,
       this.wallet,
@@ -57,7 +68,10 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2]) => {
       this.hardCap,
       this.investorMinCap,
       this.investorHardCap,
-      this.goal
+      this.goal,
+      this.foundersFund,
+      this.foundationFund,
+      this.partnersFund
     );
 
     // Pause Token
@@ -254,7 +268,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2]) => {
     });
   });
 
-
   describe('finalizing the crowdsale', function() {
 
     describe('when the goal is not reached', function() {
@@ -308,6 +321,19 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2]) => {
       // Token is finished minting
       // Mint tokens for funds
       // Add token timelocks
+    });
+  });
+
+  describe('token distribution', function() {
+    it('tracks token distribution correctly', async function () {
+      const tokenSalePercentage = await this.crowdsale.tokenSalePercentage();
+      tokenSalePercentage.should.be.bignumber.eq(this.tokenSalePercentage, 'has correct tokenSalePercentage');
+      const foundersPercentage = await this.crowdsale.foundersPercentage();
+      foundersPercentage.should.be.bignumber.eq(this.foundersPercentage, 'has correct foundersPercentage');
+      const foundationPercentage = await this.crowdsale.foundationPercentage();
+      foundationPercentage.should.be.bignumber.eq(this.foundationPercentage, 'has correct foundationPercentage');
+      const partnersPercentage = await this.crowdsale.partnersPercentage();
+      partnersPercentage.should.be.bignumber.eq(this.partnersPercentage, 'has correct partnersPercentage');
     });
   });
 
