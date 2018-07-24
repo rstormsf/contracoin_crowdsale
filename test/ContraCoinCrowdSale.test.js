@@ -14,7 +14,7 @@ const ContraCoin = artifacts.require('./ContraCoin');
 const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 const RefundVault = artifacts.require('./RefundVault');
 
-contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, investor4, purchaser, notWhitelisted]) => {
+contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, purchaser, notWhitelisted]) => {
 
   beforeEach(async function () {
     // Deploy Token
@@ -62,7 +62,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, in
     await this.token.transferOwnership(this.crowdsale.address);
 
     // Whitelist Investors
-    await this.crowdsale.addManyToWhitelist([_, investor1, investor2, investor3, investor4, purchaser]);
+    await this.crowdsale.addManyToWhitelist([_, investor1, investor2, investor3, purchaser]);
 
     // Track refund vault
     this.vaultAddress = await this.crowdsale.vault();
@@ -253,7 +253,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, in
     describe('when the goal is not reached', function() {
       beforeEach(async function () {
         // Do not meet the toal
-        await this.crowdsale.buyTokens(investor3, { value: ether(1), from: investor3 });
+        await this.crowdsale.buyTokens(investor2, { value: ether(1), from: investor2 });
         // Fastforward past end time
         await increaseTimeTo(this.closingTime + 1);
         // Finalize the crowdsale
@@ -266,15 +266,15 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, in
       });
 
       it('allows the investor to claim refund', async function () {
-        await this.vault.refund(investor3, { from: investor3 }).should.be.fulfilled;
+        await this.vault.refund(investor2, { from: investor2 }).should.be.fulfilled;
       });
     });
 
     describe('when the goal is reached', function() {
       beforeEach(async function () {
         // Meet the goal
+        await this.crowdsale.buyTokens(investor2, { value: ether(26), from: investor2 });
         await this.crowdsale.buyTokens(investor3, { value: ether(26), from: investor3 });
-        await this.crowdsale.buyTokens(investor4, { value: ether(26), from: investor4 });
         // Fastforward past end time
         await increaseTimeTo(this.closingTime + 1);
         // Finalize the crowdsale
@@ -291,9 +291,9 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, investor3, in
         const paused = await this.token.paused();
         paused.should.be.false;
         // Prevents investor from claiming refund
-        await this.vault.refund(investor3, { from: investor3 }).should.be.rejectedWith(EVMRevert);
+        await this.vault.refund(investor2, { from: investor2 }).should.be.rejectedWith(EVMRevert);
         // Enables token transfers
-        await this.token.transfer(investor4, 1, { from: investor4 }).should.be.fulfilled;
+        await this.token.transfer(investor3, 1, { from: investor3 }).should.be.fulfilled;
       });
 
       // Funds get forwarded to the admin
