@@ -59,7 +59,7 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     RefundableCrowdsale(_goal)
     public
   {
-    // require(_goal <= _hardCap);
+    require(_goal <= _hardCap);
     foundersFund   = _foundersFund;
     foundationFund = _foundationFund;
     partnersFund   = _partnersFund;
