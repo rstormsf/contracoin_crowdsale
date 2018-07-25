@@ -349,12 +349,14 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         await this.token.transfer(investor2, 1, { from: investor2 }).should.be.fulfilled;
 
         // Mints tokens for additional funds
+        // Mints funds to timelock contracts
         // TODO: Refactor me with a helper...
         let totalSupply = await this.token.totalSupply();
         totalSupply = totalSupply.toString();
 
         // Founders
-        let foundersBalance = await this.token.balanceOf(foundersFund);
+        const foundersTimelock = await this.crowdsale.foundersTimelock();
+        let foundersBalance = await this.token.balanceOf(foundersTimelock);
         foundersBalance = foundersBalance.toString();
         foundersBalance = foundersBalance / (10 ** this.decimals);
 
