@@ -46,7 +46,7 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     ERC20   _token,
     uint256 _openingTime,
     uint256 _closingTime,
-    uint256 _hardCap,
+    uint256 _cap,
     uint256 _goal,
     address _foundersFund,
     address _foundationFund,
@@ -55,11 +55,11 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
   )
     Crowdsale(_rate, _wallet, _token)
     TimedCrowdsale(_openingTime, _closingTime)
-    CappedCrowdsale(_hardCap)
+    CappedCrowdsale(_cap)
     RefundableCrowdsale(_goal)
     public
   {
-    require(_goal <= _hardCap);
+    require(_goal <= _cap);
     foundersFund   = _foundersFund;
     foundationFund = _foundationFund;
     partnersFund   = _partnersFund;
