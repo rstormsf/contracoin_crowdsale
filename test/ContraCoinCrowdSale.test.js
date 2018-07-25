@@ -367,7 +367,8 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         assert.equal(foundersBalance.toString(), foundersAmount.toString());
 
         // Foundation
-        let foundationBalance = await this.token.balanceOf(foundationFund);
+        const foundationTimelock = await this.crowdsale.foundationTimelock();
+        let foundationBalance = await this.token.balanceOf(foundationTimelock);
         foundationBalance = foundationBalance.toString();
         foundationBalance = foundationBalance / (10 ** this.decimals);
 
@@ -378,7 +379,8 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         assert.equal(foundationBalance.toString(), foundationAmount.toString());
 
         // Partners
-        let partnersBalance = await this.token.balanceOf(partnersFund);
+        const partnersTimelock = await this.crowdsale.partnersTimelock();
+        let partnersBalance = await this.token.balanceOf(partnersTimelock);
         partnersBalance = partnersBalance.toString();
         partnersBalance = partnersBalance / (10 ** this.decimals);
 

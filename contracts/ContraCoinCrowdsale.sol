@@ -138,12 +138,14 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
       // Use the public sale percentage to evaluate this figure
       uint256 _finalTotalSupply = _alreadyMinted.div(tokenSalePercentage).mul(100);
 
-      foundersTimelock = new TokenTimelock(token, foundersFund, releaseTime);
+      foundersTimelock   = new TokenTimelock(token, foundersFund, releaseTime);
+      foundationTimelock = new TokenTimelock(token, foundationFund, releaseTime);
+      partnersTimelock   = new TokenTimelock(token, partnersFund, releaseTime);
 
       // Mint tokens for funds
-      _mintableToken.mint(foundersTimelock, _finalTotalSupply.div(foundersPercentage));
-      _mintableToken.mint(foundationFund, _finalTotalSupply.div(foundationPercentage));
-      _mintableToken.mint(partnersFund,   _finalTotalSupply.div(partnersPercentage));
+      _mintableToken.mint(foundersTimelock,   _finalTotalSupply.div(foundersPercentage));
+      _mintableToken.mint(foundationTimelock, _finalTotalSupply.div(foundationPercentage));
+      _mintableToken.mint(partnersTimelock,   _finalTotalSupply.div(partnersPercentage));
 
       _mintableToken.finishMinting();
       PausableToken(token).unpause();
