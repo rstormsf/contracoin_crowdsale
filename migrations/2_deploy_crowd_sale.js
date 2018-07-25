@@ -4,7 +4,6 @@ require('babel-polyfill');
 var tokenContract = artifacts.require("./ContraCoin.sol");
 var crowdsaleContract = artifacts.require("./ContraCoinCrowdsale.sol");
 
-const latestTime = () => web3.eth.getBlock('latest').timestamp
 const ether = (n) => new web3.BigNumber(web3.toWei(n, 'ether'));
 
 const duration = {
@@ -24,10 +23,16 @@ module.exports = async function(deployer, network, accounts) {
   await deployer.deploy(tokenContract, _name, _symbol, _decimals);
   const deployedToken = await tokenContract.deployed();
 
+  // const latestBlock = await web3.eth.getBlock('latest');
+  // const latestTime = latestBlock.timestamp;
+  const latestTime = (new Date).getTime();
+
+  console.log('latestTime', latestTime);
+
   const _rate           = 500;
   const _wallet         = accounts[0]; // TODO: Replace me
   const _token          = deployedToken.address;
-  const _openingTime    = latestTime() + duration.minutes(30);
+  const _openingTime    = latestTime + duration.minutes(30);
   const _closingTime    = _openingTime + duration.weeks(1);
   const _cap            = ether(100);
   const _goal           = ether(50);
