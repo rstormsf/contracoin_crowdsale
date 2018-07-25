@@ -40,12 +40,15 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
     this.openingTime = latestTime() + duration.weeks(1);
     this.closingTime = this.openingTime + duration.weeks(1);
     this.hardCap = ether(100);
-    this.investorMinCap = ether(0.002);
-    this.investorHardCap = ether(50);
     this.goal = ether(50);
     this.foundersFund = foundersFund;
     this.foundationFund = foundationFund;
     this.partnersFund = partnersFund;
+    this.releaseTime = this.closingTime + duration.years(1);
+
+    // Investor caps
+    this.investorMinCap = ether(0.002);
+    this.investorHardCap = ether(50);
 
     // ICO Stages
     this.preIcoStage = 0;
@@ -67,12 +70,11 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       this.openingTime,
       this.closingTime,
       this.hardCap,
-      this.investorMinCap,
-      this.investorHardCap,
       this.goal,
       this.foundersFund,
       this.foundationFund,
-      this.partnersFund
+      this.partnersFund,
+      this.releaseTime
     );
 
     // Pause Token

@@ -3,6 +3,7 @@ pragma solidity 0.4.24;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/PausableToken.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/TokenTimelock.sol";
 import "openzeppelin-solidity/contracts/crowdsale/Crowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
@@ -13,8 +14,8 @@ import "openzeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsal
 contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, MintedCrowdsale, WhitelistedCrowdsale, RefundableCrowdsale {
 
   // Track investor contributions
-  uint256 public investorMinCap;
-  uint256 public investorHardCap;
+  uint256 public investorMinCap = 2000000000000000; // 0.002 ether
+  uint256 public investorHardCap = 50000000000000000000; // 50 ether
   mapping(address => uint256) public contributions;
 
   // Crowdsale Stages
@@ -31,6 +32,9 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
   uint256 public foundationPercentage = 10;
   uint256 public partnersPercentage   = 10;
 
+  // Token time lock
+  uint256 public releaseTime;
+
   constructor(
     uint    _rate,
     address _wallet,
@@ -38,12 +42,11 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     uint256 _openingTime,
     uint256 _closingTime,
     uint256 _hardCap,
-    uint256 _investorMinCap,
-    uint256 _investorHardCap,
     uint256 _goal,
     address _foundersFund,
     address _foundationFund,
-    address _partnersFund
+    address _partnersFund,
+    uint256 _releaseTime
   )
     Crowdsale(_rate, _wallet, _token)
     TimedCrowdsale(_openingTime, _closingTime)
@@ -52,11 +55,10 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     public
   {
     // require(_goal <= _hardCap);
-    investorMinCap  = _investorMinCap;
-    investorHardCap = _investorHardCap;
-    foundersFund = _foundersFund;
+    foundersFund   = _foundersFund;
     foundationFund = _foundationFund;
-    partnersFund = _partnersFund;
+    partnersFund   = _partnersFund;
+    releaseTime    = _releaseTime;
   }
 
   /**
