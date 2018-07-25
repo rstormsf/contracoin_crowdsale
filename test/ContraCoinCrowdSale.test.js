@@ -40,7 +40,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
     this.wallet = wallet;
     this.openingTime = latestTime() + duration.weeks(1);
     this.closingTime = this.openingTime + duration.weeks(1);
-    this.hardCap = ether(100);
+    this.cap = ether(100);
     this.goal = ether(50);
     this.foundersFund = foundersFund;
     this.foundationFund = foundationFund;
@@ -70,7 +70,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       this.token.address,
       this.openingTime,
       this.closingTime,
-      this.hardCap,
+      this.cap,
       this.goal,
       this.foundersFund,
       this.foundationFund,
@@ -122,7 +122,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
   describe('capped crowdsale', function () {
     it('has the correct hard cap value', async function () {
       const cap = await this.crowdsale.cap();
-      cap.should.be.bignumber.equal(this.hardCap);
+      cap.should.be.bignumber.equal(this.cap);
     });
   });
 
