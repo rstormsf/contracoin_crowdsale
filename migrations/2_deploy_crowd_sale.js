@@ -39,7 +39,7 @@ module.exports = async function(deployer, network, accounts) {
   const _foundersFund   = accounts[0]; // TODO: Replace me
   const _foundationFund = accounts[0]; // TODO: Replace me
   const _partnersFund   = accounts[0]; // TODO: Replace me
-  const _releaseTime    = ether(0.002);
+  const _releaseTime    = _closingTime + duration.days(1);
 
   await deployer.deploy(
     crowdsaleContract,
