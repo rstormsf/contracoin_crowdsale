@@ -106,12 +106,14 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
     } else if (uint(CrowdsaleStage.ICO) == _stage) {
       stage = CrowdsaleStage.ICO;
     }
+  }
 
-    if (stage == CrowdsaleStage.PreICO) {
-      rate = 500;
-    } else if (stage == CrowdsaleStage.ICO) {
-      rate = 250;
-    }
+  /**
+  * @dev Allows admin to update the crowdsale rate
+  * @param _rate Crowdsale stage
+  */
+  function setRate(uint _rate) public onlyOwner {
+    rate = _rate;
   }
 
   /**

@@ -54,8 +54,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
     // ICO Stages
     this.preIcoStage = 0;
     this.icoStage = 1;
-    this.preIcoRate = this.rate;
-    this.icoRate = 250;
 
     // Token Distribution
     this.tokenSalePercentage  = 70;
@@ -202,7 +200,13 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
   });
 
   describe('purchase rate', function () {
-    it('buys the correct number of tokens', async function () {
+    it('starts at the opening rate', async function () {
+      // Starts at the opening rate
+      const rate = await this.crowdsale.rate();
+      rate.should.be.bignumber.equal(this.rate);
+    });
+
+    it('buys the correct number of tokens at the opening rate', async function () {
       // Purchase tokens
       const value = ether(1);
       await this.crowdsale.sendTransaction({ value: value, from: investor1 });
@@ -212,11 +216,43 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       balance = balance.toString();
       balance = balance / (10 ** this.decimals);
 
-      let expectedBalance = this.preIcoRate * value;
+      let expectedBalance = this.rate * value;
       expectedBalance = expectedBalance.toString();
       expectedBalance = expectedBalance / (10 ** this.decimals);
 
       assert.equal(balance.toString(), expectedBalance.toString());
+    });
+
+    it('allows admin to update the rate', async function () {
+      const rate = 250;
+      await this.crowdsale.setRate(rate, { from: _ });
+      const newRate = await this.crowdsale.rate();
+      newRate.should.be.bignumber.equal(rate);
+    });
+
+    it('buys the correct number of tokens at the updated rate', async function () {
+      // Use a new rate
+      const rate = 250;
+      await this.crowdsale.setRate(rate, { from: _ });
+
+      // // Purchase tokens
+      const value = ether(1);
+      await this.crowdsale.sendTransaction({ value: value, from: investor1 });
+
+      // // TODO: Refactor me with a helper...
+      let balance = await this.token.balanceOf(investor1);
+      balance = balance.toString();
+      balance = balance / (10 ** this.decimals);
+
+      let expectedBalance = rate * value;
+      expectedBalance = expectedBalance.toString();
+      expectedBalance = expectedBalance / (10 ** this.decimals);
+
+      assert.equal(balance.toString(), expectedBalance.toString());
+    });
+
+    it('prevents non-admin from updating the rate', async function () {
+      await this.crowdsale.setRate(100, { from: investor1 }).should.be.rejectedWith(EVMRevert);
     });
   });
 
@@ -232,12 +268,10 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       rate.should.be.bignumber.equal(this.rate);
     });
 
-    it('allows admin to update the stage & rate', async function () {
+    it('allows admin to update the stage', async function () {
       await this.crowdsale.setCrowdsaleStage(this.icoStage, { from: _ });
       const stage = await this.crowdsale.stage();
       stage.should.be.bignumber.equal(this.icoStage);
-      const rate = await this.crowdsale.rate();
-      rate.should.be.bignumber.equal(this.icoRate);
     });
 
     it('prevents non-admin from updating the stage', async function () {
