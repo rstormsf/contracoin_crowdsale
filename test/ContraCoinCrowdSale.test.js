@@ -237,16 +237,13 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       const value = ether(1);
       await this.crowdsale.sendTransaction({ value: value, from: investor1 });
 
-      // // TODO: Refactor me with a helper...
       let balance = await this.token.balanceOf(investor1);
-      balance = balance.toString();
-      balance = balance / (10 ** this.decimals);
+      balance = formatBalance(balance, this.decimals);
 
       let expectedBalance = rate * value;
-      expectedBalance = expectedBalance.toString();
-      expectedBalance = expectedBalance / (10 ** this.decimals);
+      expectedBalance = formatBalance(expectedBalance, this.decimals);
 
-      assert.equal(balance.toString(), expectedBalance.toString());
+      assert.equal(balance, expectedBalance);
     });
 
     it('prevents non-admin from updating the rate', async function () {
@@ -390,46 +387,38 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
         // Mints tokens for additional funds
         // Mints funds to timelock contracts
-        // TODO: Refactor me with a helper...
         let totalSupply = await this.token.totalSupply();
         totalSupply = totalSupply.toString();
 
         // Founders
         const foundersTimelockAddress = await this.crowdsale.foundersTimelock();
         let foundersTimelockBalance = await this.token.balanceOf(foundersTimelockAddress);
-        foundersTimelockBalance = foundersTimelockBalance.toString();
-        foundersTimelockBalance = foundersTimelockBalance / (10 ** this.decimals);
+        foundersTimelockBalance = formatBalance(foundersTimelockBalance, this.decimals);
 
         let foundersAmount = totalSupply / this.foundersPercentage;
-        foundersAmount = foundersAmount.toString();
-        foundersAmount = foundersAmount / (10 ** this.decimals);
+        foundersAmount = formatBalance(foundersAmount, this.decimals);
 
         assert.equal(foundersTimelockBalance.toString(), foundersAmount.toString());
 
         // Foundation
         const foundationTimelockAddress = await this.crowdsale.foundationTimelock();
         let foundationTimelockBalance = await this.token.balanceOf(foundationTimelockAddress);
-        foundationTimelockBalance = foundationTimelockBalance.toString();
-        foundationTimelockBalance = foundationTimelockBalance / (10 ** this.decimals);
+        foundationTimelockBalance = formatBalance(foundationTimelockBalance, this.decimals);
 
         let foundationAmount = totalSupply / this.foundationPercentage;
-        foundationAmount = foundationAmount.toString();
-        foundationAmount = foundationAmount / (10 ** this.decimals);
+        foundationAmount = formatBalance(foundationAmount, this.decimals);
 
         assert.equal(foundationTimelockBalance.toString(), foundationAmount.toString());
 
         // Partners
         const partnersTimelockAddress = await this.crowdsale.partnersTimelock();
         let partnersTimelockBalance = await this.token.balanceOf(partnersTimelockAddress);
-        partnersTimelockBalance = partnersTimelockBalance.toString();
-        partnersTimelockBalance = partnersTimelockBalance / (10 ** this.decimals);
+        partnersTimelockBalance = formatBalance(partnersTimelockBalance, this.decimals);
 
         let partnersAmount = totalSupply / this.partnersPercentage;
-        partnersAmount = partnersAmount.toString();
-        partnersAmount = partnersAmount / (10 ** this.decimals);
+        partnersAmount = formatBalance(partnersAmount, this.decimals);
 
         assert.equal(partnersTimelockBalance.toString(), partnersAmount.toString());
-
 
         // Can't withdraw from timelocks
         const foundersTimelock = await TokenTimelock.at(foundersTimelockAddress);
@@ -452,22 +441,19 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
         // Founders
         let foundersBalance = await this.token.balanceOf(this.foundersFund);
-        foundersBalance = foundersBalance.toString();
-        foundersBalance = foundersBalance / (10 ** this.decimals);
+        foundersBalance = formatBalance(foundersBalance, this.decimals);
 
-        assert.equal(foundersBalance.toString(), foundersAmount.toString());
+        assert.equal(foundersBalance, foundersAmount);
 
-        // Foundation
+        // // Foundation
         let foundationBalance = await this.token.balanceOf(this.foundationFund);
-        foundationBalance = foundationBalance.toString();
-        foundationBalance = foundationBalance / (10 ** this.decimals);
+        foundationBalance = formatBalance(foundationBalance, this.decimals);
 
         assert.equal(foundationBalance.toString(), foundationAmount.toString());
 
-        // Partners
+        // // Partners
         let partnersBalance = await this.token.balanceOf(this.partnersFund);
-        partnersBalance = partnersBalance.toString();
-        partnersBalance = partnersBalance / (10 ** this.decimals);
+        partnersBalance = formatBalance(partnersBalance, this.decimals);
 
         assert.equal(partnersBalance.toString(), partnersAmount.toString());
 
