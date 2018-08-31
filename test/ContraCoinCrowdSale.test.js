@@ -2,6 +2,7 @@ import ether from './helpers/ether';
 import EVMRevert from './helpers/EVMRevert';
 import { increaseTimeTo, duration } from './helpers/increaseTime';
 import latestTime from './helpers/latestTime';
+import formatBalance from './helpers/formatBalance';
 
 const BigNumber = web3.BigNumber;
 
@@ -211,16 +212,13 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       const value = ether(1);
       await this.crowdsale.sendTransaction({ value: value, from: investor1 });
 
-      // TODO: Refactor me with a helper...
       let balance = await this.token.balanceOf(investor1);
-      balance = balance.toString();
-      balance = balance / (10 ** this.decimals);
+      balance = formatBalance(balance, this.decimals);
 
       let expectedBalance = this.rate * value;
-      expectedBalance = expectedBalance.toString();
-      expectedBalance = expectedBalance / (10 ** this.decimals);
+      expectedBalance = formatBalance(expectedBalance, this.decimals);
 
-      assert.equal(balance.toString(), expectedBalance.toString());
+      assert.equal(balance, expectedBalance);
     });
 
     it('allows admin to update the rate', async function () {
