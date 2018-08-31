@@ -476,9 +476,14 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       partnersPercentage.should.be.bignumber.eq(this.partnersPercentage, 'has correct partnersPercentage');
     });
 
-    it('is a valid percentage breakdown', function () {
-      const total = this.tokenSalePercentage + this.foundersPercentage + this.foundationPercentage + this.partnersPercentage;
-      total.should.eq(100);
+    it('is a valid percentage breakdown', async function () {
+      const tokenSalePercentage = await this.crowdsale.tokenSalePercentage();
+      const foundersPercentage = await this.crowdsale.foundersPercentage();
+      const foundationPercentage = await this.crowdsale.foundationPercentage();
+      const partnersPercentage = await this.crowdsale.partnersPercentage();
+
+      const total = tokenSalePercentage.toNumber() + foundersPercentage.toNumber() + foundationPercentage.toNumber() + partnersPercentage.toNumber()
+      total.should.be.bignumber.eq(100);
     });
   });
 });
