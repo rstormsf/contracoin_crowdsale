@@ -411,9 +411,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
         assert.equal(partnersTimelockBalance.toString(), partnersAmount.toString());
 
-        // Finishes minting token
-        const mintingFinished = await this.token.mintingFinished();
-        mintingFinished.should.be.true;
 
         // Can't withdraw from timelocks
         const foundersTimelock = await TokenTimelock.at(foundersTimelockAddress);
@@ -454,6 +451,14 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         partnersBalance = partnersBalance / (10 ** this.decimals);
 
         assert.equal(partnersBalance.toString(), partnersAmount.toString());
+
+        // Finishes minting token
+        const mintingFinished = await this.token.mintingFinished();
+        mintingFinished.should.be.true;
+
+        // Transfers ownership to the wallet
+        const owner = await this.token.owner();
+        owner.should.equal(this.wallet);
       });
 
     });

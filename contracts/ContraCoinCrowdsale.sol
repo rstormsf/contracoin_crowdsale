@@ -148,7 +148,11 @@ contract ContraCoinCrowdsale is Crowdsale, TimedCrowdsale, CappedCrowdsale, Mint
       _mintableToken.mint(partnersTimelock,   _finalTotalSupply.div(partnersPercentage));
 
       _mintableToken.finishMinting();
-      PausableToken(token).unpause();
+
+      // Unpause the token
+      PausableToken _pausableToken = PausableToken(token);
+      _pausableToken.unpause();
+      _pausableToken.transferOwnership(wallet);
     }
 
     super.finalization();
