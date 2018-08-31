@@ -343,21 +343,8 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         goalReached.should.be.true;
 
         // Transfers funds to the wallet
-        let newWalletBalance = await web3.eth.getBalance(this.wallet);
-        // newWalletBalance = web3.fromWei(newWalletBalance);
-        // newWalletBalance = new BigNumber(newWalletBalance);
-        // newWalletBalance = newWalletBalance.toNumber();
-
-        // let expectedWalletBalance = (this.walletBalance + ether(52))
-        // expectedWalletBalance = web3.fromWei(expectedWalletBalance);
-        // expectedWalletBalance = new BigNumber(expectedWalletBalance);
-        // expectedWalletBalance = expectedWalletBalance.toNumber();
-
-        // console.log('wallet balance', this.walletBalance);
-        // console.log('new wallet balance', newWalletBalance);
-        // console.log('expected wallet balance', expectedWalletBalance);
-
-        expect(newWalletBalance).to.be.greaterThan(ether(150));
+        let newWalletBalance = await web3.eth.getBalance(wallet);
+        expect(newWalletBalance).to.be.greaterThan(this.walletBalance);
 
         // Unpauses the token
         const paused = await this.token.paused();
