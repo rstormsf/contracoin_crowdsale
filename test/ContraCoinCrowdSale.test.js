@@ -16,7 +16,7 @@ const ContraCoinCrowdsale = artifacts.require('./ContraCoinCrowdsale');
 const RefundVault = artifacts.require('./RefundVault');
 const TokenTimelock = artifacts.require('./TokenTimelock');
 
-contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund, foundationFund, partnersFund]) => {
+contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund, partnersFund]) => {
 
   before(async function() {
     // Transfer extra ether to investor1's account for testing
@@ -44,7 +44,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
     this.cap = ether(100);
     this.goal = ether(50);
     this.foundersFund = foundersFund;
-    this.foundationFund = foundationFund;
     this.partnersFund = partnersFund;
     this.releaseTime = this.closingTime + duration.years(1);
 
@@ -58,8 +57,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
     // Token Distribution
     this.tokenSalePercentage  = 70;
-    this.foundersPercentage   = 10;
-    this.foundationPercentage = 10;
+    this.foundersPercentage   = 20;
     this.partnersPercentage   = 10;
 
     // Deploy Crowdsale
@@ -72,7 +70,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       this.cap,
       this.goal,
       this.foundersFund,
-      this.foundationFund,
       this.partnersFund,
       this.releaseTime
     );
@@ -344,8 +341,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       it('does not mint tokens for additional funds', async function () {
         const foundersBalance = await this.token.balanceOf(foundersFund);
         foundersBalance.should.be.bignumber.eq(0);
-        const foundationBalance = await this.token.balanceOf(foundationFund);
-        foundationBalance.should.be.bignumber.eq(0);
         const partnersBalance = await this.token.balanceOf(partnersFund);
         partnersBalance.should.be.bignumber.eq(0);
       });
@@ -388,34 +383,24 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         // Mints tokens for additional funds
         // Mints funds to timelock contracts
         let totalSupply = await this.token.totalSupply();
-        totalSupply = totalSupply.toString();
+        assert.equal(totalSupply, '3.714285714285714285713e+22');
 
-        // Founders
+        // Founders - 20%
         const foundersTimelockAddress = await this.crowdsale.foundersTimelock();
         let foundersTimelockBalance = await this.token.balanceOf(foundersTimelockAddress);
         foundersTimelockBalance = formatBalance(foundersTimelockBalance, this.decimals);
 
-        let foundersAmount = totalSupply / this.foundersPercentage;
+        let foundersAmount = (totalSupply * this.foundersPercentage) / 100;
         foundersAmount = formatBalance(foundersAmount, this.decimals);
 
         assert.equal(foundersTimelockBalance.toString(), foundersAmount.toString());
 
-        // Foundation
-        const foundationTimelockAddress = await this.crowdsale.foundationTimelock();
-        let foundationTimelockBalance = await this.token.balanceOf(foundationTimelockAddress);
-        foundationTimelockBalance = formatBalance(foundationTimelockBalance, this.decimals);
-
-        let foundationAmount = totalSupply / this.foundationPercentage;
-        foundationAmount = formatBalance(foundationAmount, this.decimals);
-
-        assert.equal(foundationTimelockBalance.toString(), foundationAmount.toString());
-
-        // Partners
+        // Partners - 10%
         const partnersTimelockAddress = await this.crowdsale.partnersTimelock();
         let partnersTimelockBalance = await this.token.balanceOf(partnersTimelockAddress);
         partnersTimelockBalance = formatBalance(partnersTimelockBalance, this.decimals);
 
-        let partnersAmount = totalSupply / this.partnersPercentage;
+        let partnersAmount = (totalSupply * this.partnersPercentage) / 100;
         partnersAmount = formatBalance(partnersAmount, this.decimals);
 
         assert.equal(partnersTimelockBalance.toString(), partnersAmount.toString());
@@ -424,9 +409,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         const foundersTimelock = await TokenTimelock.at(foundersTimelockAddress);
         await foundersTimelock.release().should.be.rejectedWith(EVMRevert);
 
-        const foundationTimelock = await TokenTimelock.at(foundationTimelockAddress);
-        await foundationTimelock.release().should.be.rejectedWith(EVMRevert);
-
         const partnersTimelock = await TokenTimelock.at(partnersTimelockAddress);
         await partnersTimelock.release().should.be.rejectedWith(EVMRevert);
 
@@ -434,7 +416,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         await increaseTimeTo(this.releaseTime + 1);
 
         await foundersTimelock.release().should.be.fulfilled;
-        await foundationTimelock.release().should.be.fulfilled;
         await partnersTimelock.release().should.be.fulfilled;
 
         // Funds have token balances now
@@ -445,13 +426,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
         assert.equal(foundersBalance, foundersAmount);
 
-        // // Foundation
-        let foundationBalance = await this.token.balanceOf(this.foundationFund);
-        foundationBalance = formatBalance(foundationBalance, this.decimals);
-
-        assert.equal(foundationBalance.toString(), foundationAmount.toString());
-
-        // // Partners
+        // Partners
         let partnersBalance = await this.token.balanceOf(this.partnersFund);
         partnersBalance = formatBalance(partnersBalance, this.decimals);
 
@@ -465,7 +440,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
         const owner = await this.token.owner();
         owner.should.equal(this.wallet);
       });
-
     });
   });
 
@@ -475,8 +449,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
       tokenSalePercentage.should.be.bignumber.eq(this.tokenSalePercentage, 'has correct tokenSalePercentage');
       const foundersPercentage = await this.crowdsale.foundersPercentage();
       foundersPercentage.should.be.bignumber.eq(this.foundersPercentage, 'has correct foundersPercentage');
-      const foundationPercentage = await this.crowdsale.foundationPercentage();
-      foundationPercentage.should.be.bignumber.eq(this.foundationPercentage, 'has correct foundationPercentage');
       const partnersPercentage = await this.crowdsale.partnersPercentage();
       partnersPercentage.should.be.bignumber.eq(this.partnersPercentage, 'has correct partnersPercentage');
     });
@@ -484,10 +456,9 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
     it('is a valid percentage breakdown', async function () {
       const tokenSalePercentage = await this.crowdsale.tokenSalePercentage();
       const foundersPercentage = await this.crowdsale.foundersPercentage();
-      const foundationPercentage = await this.crowdsale.foundationPercentage();
       const partnersPercentage = await this.crowdsale.partnersPercentage();
 
-      const total = tokenSalePercentage.toNumber() + foundersPercentage.toNumber() + foundationPercentage.toNumber() + partnersPercentage.toNumber()
+      const total = tokenSalePercentage.toNumber() + foundersPercentage.toNumber() + partnersPercentage.toNumber()
       total.should.be.bignumber.eq(100);
     });
   });
