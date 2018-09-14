@@ -300,7 +300,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
       it('forwards funds to the wallet', async function () {
         const balance = await web3.eth.getBalance(this.wallet);
-        expect(balance.toNumber()).to.be.above(ether(100));
+        expect(balance.toNumber()).to.be.above(ether(100).toNumber());
       });
     });
 
@@ -368,7 +368,7 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
         // Transfers funds to the wallet
         let newWalletBalance = await web3.eth.getBalance(wallet);
-        expect(newWalletBalance).to.be.greaterThan(this.walletBalance);
+        expect(newWalletBalance.toNumber()).to.be.greaterThan(this.walletBalance.toNumber());
 
         // Unpauses the token
         const paused = await this.token.paused();
