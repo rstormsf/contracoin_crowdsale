@@ -432,10 +432,6 @@ contract('ContraCoinCrowdsale', ([_, wallet, investor1, investor2, foundersFund,
 
         assert.equal(partnersBalance.toString(), partnersAmount.toString());
 
-        // Finishes minting token
-        const mintingFinished = await this.token.mintingFinished();
-        mintingFinished.should.be.true;
-
         // Transfers ownership to the wallet
         const owner = await this.token.owner();
         owner.should.equal(this.wallet);
